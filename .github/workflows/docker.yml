@@ -1,0 +1,32 @@
+name: Docker with JFrog CLI
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+    
+permissions:
+  # This is required for requesting the OIDC token
+  id-token: write
+  # This is required for actions/checkout
+  contents: read
+  
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup JF Cli
+        uses: jfrog/setup-jfrog-cli@v4
+        env:
+          # JFrog platform url (for example: https://acme.jfrog.io)
+          JF_URL: ${{ secrets.JF_URL }}
+        with:
+          # Name of the OIDC provider as specified on the OIDC integration page in the JFrog Platform
+          oidc-provider-name: mathieup-github
+          
+      - name: Build Docker
+        run: | 
+          jf docker build
+        #Hello moto -b path/to/build.gradle
+        #jf rt bp gradle-example --url https://psemea.jfrog.io/artifactory/ob1-mat --access-token $JF_ACCESS_TOKEN
